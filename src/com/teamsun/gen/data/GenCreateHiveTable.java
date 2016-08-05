@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GenCreateHiveTable {
 
@@ -12,6 +15,7 @@ public class GenCreateHiveTable {
 		File dir = new File("D:\\bigData\\导数据");
 		
 		File[] fs = dir.listFiles();
+		Map<String, String> clusterMap = getClustereds();
 		
 		for (File f : fs)
 		{
@@ -52,34 +56,64 @@ public class GenCreateHiveTable {
              *
              **/
             
-//            sb.append("PARTITIONED BY (yearmonth string) \n" );
-//            sb.append("CLUSTERED BY (" + "" + ") INTO " + 2 + " BUCKETS \n" );
-//            sb.append("STORED AS ORC \n" );
-//            sb.append("TBLPROPERTIES (\"transactional\"=\"true\"); \n\n" );
+            /*sb.append("PARTITIONED BY (yearmonth string) \n" );
+            sb.append("CLUSTERED BY (" + "" + ") INTO " + 2 + " BUCKETS \n" );
+            sb.append("STORED AS ORC \n" );
+            sb.append("TBLPROPERTIES (\"transactional\"=\"true\"); \n\n" );*/
+            
+           /* PARTITIONED BY RANGE (reg_date string) (
+            		PARTITION VALUES LESS THAN (20090000),
+            		PARTITION VALUES LESS THAN (20100000),
+            		PARTITION VALUES LESS THAN (20110000),
+            		PARTITION VALUES LESS THAN (20120000),
+            		PARTITION VALUES LESS THAN (20130000),
+            		PARTITION VALUES LESS THAN (20140000),
+            		PARTITION VALUES LESS THAN (MAXVALUE));*/
             
             
+            sb.append("PARTITIONED BY RANGE (yearmonth string) ( \n" );
+            Calendar c = Calendar.getInstance();
+    		c.set(Calendar.YEAR, 2012);
+    		c.set(Calendar.MONTH, 00);
+    		c.set(Calendar.DAY_OF_MONTH, 01);
+    		
+    		Calendar c2 = Calendar.getInstance();
+    		c2.set(Calendar.YEAR, 2018);
+    		c2.set(Calendar.MONTH, 11);
+    		c2.set(Calendar.DAY_OF_MONTH, 01);
+    		
+    		while (c2.after(c))
+    		{
+    			c.add(Calendar.MONTH, 1);
+    			sb.append(" PARTITION VALUES LESS THAN (" + c.get(Calendar.YEAR) + "" + ((c.get(Calendar.MONTH) + 1) < 10?"0"+(c.get(Calendar.MONTH) + 1):(c.get(Calendar.MONTH) + 1)) + "), \n");
+    		}
             
-            
+    		sb = new StringBuffer(sb.substring(0, sb.length() - 3));
+    		sb.append(") \n");
+            String[] clusterInfo = clusterMap.get(tableName).split("-");
+    		sb.append("CLUSTERED BY (" + clusterInfo[0] + ") INTO " + 2 + " BUCKETS \n" );
+            sb.append("STORED AS ORC \n" );
+            sb.append("TBLPROPERTIES (\"transactional\"=\"true\"); \n\n" );
             
             /*sb.append("ROW FORMAT SERDE \n");
             sb.append(" 'org.apache.hadoop.hive.ql.io.orc.OrcSerde'  \n");
             sb.append("STORED AS INPUTFORMAT \n");
             sb.append("'org.apache.hadoop.hive.ql.io.orc.OrcInputFormat' \n");
             sb.append("OUTPUTFORMAT \n");
-            sb.append("'org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat'; \n");*/
+            sb.append("'org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat'; \n");
             
             /**
              * 建文件文件外表
              *
              **/
-            sb.append("ROW FORMAT DELIMITED  " + "\n");
-            sb.append("FIELDS TERMINATED BY \'\\,\'" + "\n");
+            /*sb.append("ROW FORMAT DELIMITED  " + "\n");
+            sb.append("FIELDS TERMINATED BY \'\\t\'" + "\n");
             sb.append("STORED AS INPUTFORMAT " + "\n");
             sb.append("'org.apache.hadoop.mapred.TextInputFormat'" + "\n");
             sb.append("OUTPUTFORMAT" + "\n");
             sb.append("'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat' \n");
             sb.append("LOCATION \n");
-            sb.append("'/EMS_Data/teamsun/" + tableName.toUpperCase() + "'; \n");
+            sb.append("'/EMS_Data/teamsun/test/" + tableName.toUpperCase() + "_TEST'; \n");*/
             
             //insert into table ems_pmart.TB_CDE_CORE_SERVICES_73 select * from ems_pmart.TMP_TB_CDE_CORE_SERVICES_73;
             
@@ -125,4 +159,26 @@ public class GenCreateHiveTable {
 		}
 	}
 
+	private static Map<String, String> getClustereds() throws Exception
+	{
+		Map<String, String> clusteredMap = new HashMap<String, String>();
+		File rowkeyFile = new File("D:\\bigData\\clusteredInfo.txt");
+		
+		InputStreamReader isr = new InputStreamReader(new FileInputStream(rowkeyFile), "UTF-8");
+		BufferedReader br = new BufferedReader(isr);
+		String line = "";
+		
+		while ((line = br.readLine()) != null) 
+		{
+//			System.out.println(line);
+			String tbName = line.split("\\t")[0];
+			String clusters = line.split("\\t")[1];
+			String num = line.split("\\t")[2];
+			
+			
+			clusteredMap.put(tbName, clusters + "-" + num);
+		}
+		
+		return clusteredMap;
+	}
 }

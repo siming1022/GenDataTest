@@ -67,13 +67,15 @@ public class GenImportFronTd2Hdfs {
 		            
 		            sb.append(tempStr.substring(0, tempStr.length() - 2));
 		            sb.append(" from EMS_PMART." + tableName.toUpperCase() + " where " + whereCols + " \\$CONDITIONS ");
-		            sb.append("\" --append --target-dir /EMS_Data/teamsun/" + tableName.toUpperCase() + " --null-string '\\\\N' --null-non-string '\\\\N'  --m 1");
+		            sb.append("\" --append --target-dir /EMS_Data/teamsun/" + tableName.toUpperCase() + " --null-string '\\\\N' --null-non-string '\\\\N' --input-fields-terminated-by '\\t' --m 1");
 		            
 		            
 		            System.out.println(sb.toString());
-		            System.out.println();
+//		            System.out.println();
 //			            writeToFile(tableName, sb.toString());
 //			            System.out.println("hdfs dfs -rmr /EMS_Data/teamsun/" + tableName.toUpperCase() + " ");
+//			            System.out.println("hdfs dfs -du -h /EMS_Data/teamsun/" + tableName.toUpperCase() + " ");
+//			            System.out.println("hdfs dfs -count /EMS_Data/teamsun/" + tableName.toUpperCase() + " ");
 //		            System.out.println("insert into ems_pmart." + tableName.toUpperCase() + " SELECT * FROM test." + tableName.toUpperCase());
 		            
 		        }

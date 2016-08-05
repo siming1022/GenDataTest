@@ -38,40 +38,46 @@ public class GenMergeSql {
     		String line = "";
         		 
             String tableName = f.getName().replace(".txt", "").replace(".TXT", "").toUpperCase();
-            String tempTableName = tableName + "_TEMP";
-//            System.out.println(tableName);
-            StringBuffer sb = new StringBuffer("set transaction.type = inceptor; \n");
-            sb.append("drop table if exists " + tempTableName + "; \n");
-            sb.append("create temporary table " + tempTableName + " stored as orc as select * from ems_pdata." + tableName + " where load_date='qqyyrr'; \n");
-            sb.append("MERGE INTO ems_pdata_orc." + tableName + " PARTITION (yearmonth = 'qqyymm') a USING " + tempTableName + " b ON (a.key = b.key) WHEN MATCHED THEN UPDATE SET ");
+            StringBuffer sb = new StringBuffer("");
+            sb.append("MERGE INTO (select * from ems_pdata_range." + tableName + " where deal_date >= 'qqyymm') a USING (select * from ems_pdata." + tableName + " where load_date='qqyyrr') b ON (a.key = b.key) WHEN MATCHED THEN UPDATE SET ");
             
             String aSql = "";
             String bSql = "";
             String abSql = "";
             
-            String noCol = clusterMap.get(tableName).split("-")[0].toLowerCase();
+            String[] noCols = clusterMap.get(tableName).split("-")[0].split(",");
             while ((line = br.readLine()) != null) 
             {
         		String[] cols = line.substring(line.indexOf("      ")+6).split(" ");
         		
         		aSql += "a." + cols[0] + ",";
         		bSql += "b." + cols[0] + ",";
-        		if (!cols[0].toLowerCase().equals(noCol))
+        		boolean flag = false;
+        		for (String noCol : noCols)
+        		{
+        			if (cols[0].toLowerCase().equals(noCol.toLowerCase()))
+        			{
+        				flag = true;
+        				break;
+        			}
+        		}
+        		
+        		if (!flag)
         		{
         			abSql += "a." + cols[0] + " = b." + cols[0] + ",";
         		}
             }
             
-            aSql = aSql.substring(0, aSql.length() - 1);
-            bSql = bSql.substring(0, bSql.length() - 1);
+            aSql = aSql.substring(0, aSql.length() - 1) + ",a.key";
+            bSql = bSql.substring(0, bSql.length() - 1) + ",b.key";
             abSql = abSql.substring(0, abSql.length() - 1);
             
             sb.append(abSql + " WHEN NOT MATCHED THEN INSERT (");
             sb.append(aSql + ") VALUES (");
             sb.append(bSql + "); ");
             
-//            System.out.println(sb.toString() + "\n\n\n");
-            writeToFile(tableName, sb.toString());
+            System.out.println(sb.toString() + "\n\n\n");
+//            writeToFile(tableName, sb.toString());
             
             
         }
