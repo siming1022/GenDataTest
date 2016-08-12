@@ -1,12 +1,17 @@
 package com.teamsun.gen.data;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,20 +19,17 @@ import java.util.StringTokenizer;
 
 public class Test {
 
+	static final String PATH = "C:\\Users\\Administrator\\Desktop\\数据转换\\";
+	
 	public static void main(String[] args) throws Exception 
 	{
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.YEAR, 2014);
-		c.set(Calendar.MONTH, 00);
-		c.set(Calendar.DAY_OF_MONTH, 01);
+		Date d = new Date();
+		DateFormat df = new SimpleDateFormat("yyyyMMdd");
+		String ds = df.format(d);
 		
-		Calendar c2 = Calendar.getInstance();
-		c2.set(Calendar.YEAR, 2014);
-		c2.set(Calendar.MONTH, 11);
-		c2.set(Calendar.DAY_OF_MONTH, 31);
+		String s = "20160216140004.dat";
 		
-		System.out.println(c.getTime().toLocaleString());
-		System.out.println(c2.getTime().toLocaleString());
+		System.out.println(s.substring(0, 8));
 	}
 
 

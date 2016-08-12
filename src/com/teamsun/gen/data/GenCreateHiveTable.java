@@ -27,14 +27,13 @@ public class GenCreateHiveTable {
         	//生成hive 外表建表语句
             String tableName = f.getName().replaceAll(".txt", "").replaceAll(".TXT", "");
             
-            
 //			            StringBuffer sb = new StringBuffer("");
             
 //			            StringBuffer sb = new StringBuffer(" drop table if exists ems_pmart.TMP_" + tableName + "; \n");
 //			            sb.append("create EXTERNAL table ems_pmart.TMP_" + tableName + "(");
 
-            StringBuffer sb = new StringBuffer(" drop table if exists test." + tableName + "; \n");
-            sb.append("create EXTERNAL table test." + tableName + "(");
+            StringBuffer sb = new StringBuffer(" drop table if exists ems_pdata_text." + tableName + "; \n");
+            sb.append("create EXTERNAL table ems_pdata_text." + tableName + "(");
             StringBuffer queryCols = new StringBuffer();
             
             while ((line = br.readLine()) != null) 
@@ -61,19 +60,9 @@ public class GenCreateHiveTable {
             sb.append("STORED AS ORC \n" );
             sb.append("TBLPROPERTIES (\"transactional\"=\"true\"); \n\n" );*/
             
-           /* PARTITIONED BY RANGE (reg_date string) (
-            		PARTITION VALUES LESS THAN (20090000),
-            		PARTITION VALUES LESS THAN (20100000),
-            		PARTITION VALUES LESS THAN (20110000),
-            		PARTITION VALUES LESS THAN (20120000),
-            		PARTITION VALUES LESS THAN (20130000),
-            		PARTITION VALUES LESS THAN (20140000),
-            		PARTITION VALUES LESS THAN (MAXVALUE));*/
-            
-            
-            sb.append("PARTITIONED BY RANGE (yearmonth string) ( \n" );
+            /*sb.append("PARTITIONED BY RANGE (Acct_Date string) ( \n" );
             Calendar c = Calendar.getInstance();
-    		c.set(Calendar.YEAR, 2012);
+    		c.set(Calendar.YEAR, 2015);
     		c.set(Calendar.MONTH, 00);
     		c.set(Calendar.DAY_OF_MONTH, 01);
     		
@@ -85,15 +74,15 @@ public class GenCreateHiveTable {
     		while (c2.after(c))
     		{
     			c.add(Calendar.MONTH, 1);
-    			sb.append(" PARTITION VALUES LESS THAN (" + c.get(Calendar.YEAR) + "" + ((c.get(Calendar.MONTH) + 1) < 10?"0"+(c.get(Calendar.MONTH) + 1):(c.get(Calendar.MONTH) + 1)) + "), \n");
+    			sb.append(" PARTITION VALUES LESS THAN ('" + c.get(Calendar.YEAR) + "" + ((c.get(Calendar.MONTH) + 1) < 10?"0"+(c.get(Calendar.MONTH) + 1):(c.get(Calendar.MONTH) + 1)) + "'), \n");
     		}
             
-    		sb = new StringBuffer(sb.substring(0, sb.length() - 3));
+    		sb.append(" PARTITION VALUES LESS THAN (MAXVALUE) \n");
     		sb.append(") \n");
-            String[] clusterInfo = clusterMap.get(tableName).split("-");
-    		sb.append("CLUSTERED BY (" + clusterInfo[0] + ") INTO " + 2 + " BUCKETS \n" );
+//            String[] clusterInfo = clusterMap.get(tableName).split("-");
+    		sb.append("CLUSTERED BY (Mail_num) INTO " + 997 + " BUCKETS \n" );
             sb.append("STORED AS ORC \n" );
-            sb.append("TBLPROPERTIES (\"transactional\"=\"true\"); \n\n" );
+            sb.append("TBLPROPERTIES (\"transactional\"=\"true\"); \n\n" );*/
             
             /*sb.append("ROW FORMAT SERDE \n");
             sb.append(" 'org.apache.hadoop.hive.ql.io.orc.OrcSerde'  \n");
@@ -113,16 +102,13 @@ public class GenCreateHiveTable {
             sb.append("OUTPUTFORMAT" + "\n");
             sb.append("'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat' \n");
             sb.append("LOCATION \n");
-            sb.append("'/EMS_Data/teamsun/test/" + tableName.toUpperCase() + "_TEST'; \n");*/
+            sb.append("'/EMS_Data/teamsun/temp/" + tableName.toUpperCase() + "'; \n");*/
             
-            //insert into table ems_pmart.TB_CDE_CORE_SERVICES_73 select * from ems_pmart.TMP_TB_CDE_CORE_SERVICES_73;
-            
-//			            ROW FORMAT SERDE 
-//			            'org.apache.hadoop.hive.ql.io.orc.OrcSerde' 
-//			          STORED AS INPUTFORMAT 
-//			            'org.apache.hadoop.hive.ql.io.orc.OrcInputFormat' 
-//			          OUTPUTFORMAT 
-//			            'org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat'
+            sb.append("ROW FORMAT DELIMITED  " + "\n");
+            sb.append("FIELDS TERMINATED BY \'\\t\'" + "\n");
+            sb.append("STORED AS TEXTFILE " + "\n");
+            sb.append("LOCATION \n");
+            sb.append("'/EMS_Data/teamsun/temp/" + tableName.toUpperCase() + "'; \n");
             
 			            System.out.println(sb.toString());
 //			            System.out.println("insert into table ems_pmart." + tableName.toUpperCase() + " select * from ems_pmart.txt_" + tableName.toUpperCase() + ";");
