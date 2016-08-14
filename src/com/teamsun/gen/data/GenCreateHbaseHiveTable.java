@@ -49,7 +49,11 @@ public class GenCreateHbaseHiveTable {
             
             String tempSb = "";
             String hbaseColSb = "";
-
+            
+            boolean allColRowkey = !rowkeyMap.containsKey(tableName.toUpperCase());
+            if (!allColRowkey)
+            	rowKey = getRowkeyStr(rowkeyMap.get(tableName));
+            
             while ((line = br.readLine()) != null) 
             {
         		String[] cols = line.substring(line.indexOf("      ")+6).split(" ");
@@ -58,26 +62,28 @@ public class GenCreateHbaseHiveTable {
         		
         		hbaseColSb += "f:" + cols[0].toUpperCase() + ","; 
               	
+        		rowKey += cols[0].toUpperCase() + ":string,";
             }
             
+            rowKey = rowKey.substring(0, rowKey.length() - 1);
             
             tempSb = tempSb.substring(0, tempSb.length() - 3) + ") \n";
-            rowKey = getRowkeyStr(rowkeyMap.get(tableName));
+            
             hbaseColSb = hbaseColSb.substring(0, hbaseColSb.length() - 1);
             
             sb.append("key struct<" + rowKey + ">, \n");
             
-            sb.append(tempSb.toString() + "\n");
+            sb.append(tempSb.toString() + "");
             
             sb.append("row format delimited collection items" + "\n");
             sb.append("terminated by '~'" + "\n");
             sb.append("STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'" + "\n");
             sb.append("with SERDEPROPERTIES (\"hbase.columns.mapping\" = \":key," + "\n");
             sb.append(hbaseColSb + "\") \n");
-            sb.append("TBLPROPERTIES (\"hbase.table.name\" = \"" + tableName + "\");");
+            sb.append("TBLPROPERTIES (\"hbase.table.name\" = \"" + tableName + "\");\n\n\n");
             
-            
-//            System.out.println("alter '" + tableName + "', {NAME => 'f', DATA_BLOCK_ENCODING => 'PREFIX', COMPRESSION => 'SNAPPY'}");
+//            System.out.println("create '" + tableName.toUpperCase() + "', 'f'");
+//            System.out.println("alter '" + tableName.toUpperCase() + "', {NAME => 'f', DATA_BLOCK_ENCODING => 'PREFIX', COMPRESSION => 'SNAPPY'}");
 //            System.out.println("-----------------------------------" + tableName + "------------------------------------------");
             System.out.println(sb.toString());
             

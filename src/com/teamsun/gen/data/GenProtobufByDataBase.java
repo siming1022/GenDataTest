@@ -22,36 +22,41 @@ public class GenProtobufByDataBase
 		{
 			File dir = new File("D:\\bigData\\导数据\\");
 			 File[] fs = dir.listFiles();
-	         
+			 int i = 1;
 	         for (File f : fs)
 	         {
 	        	 InputStreamReader isr = new InputStreamReader(new FileInputStream(f), "GBK");
 	        	 BufferedReader br = new BufferedReader(isr);
-	        	 String line = "";
 	        	 
+	        	 String oldTbName = f.getName().toLowerCase().replaceAll(".txt", "").toUpperCase();
 	        	 String tableName = transTableName(f.getName().toLowerCase().replaceAll(".txt", ""));
-	        	 String family = "f";
-	        	 String entityName = "EMS_Field_List.FeedbackMid";
-	        	 String v = "msg.getFeedbackMid().get";
-	        	 
 //	        	 genProtobuf(f);
 //	        	 genJavaStatic(f);
-	        	 genHbaseInput(f);
+//	        	 genHbaseInput(f);
 	        	 
-	        	 int i = 0;
+//	        	 System.out.println("\tHTable " + oldTbName + ";");
+//	        	 System.out.println(oldTbName + " = new HTable(this.conf,\"" + oldTbName + "\");");
+//	        	 System.out.println(oldTbName + ".setAutoFlush(false, true);");
+//	        	 System.out.println("optional " + tableName + "  " + tableName.toLowerCase() + " = " + i + ";" );
 	        	 
-//	        	 StringBuffer sb = new StringBuffer(tableName + ".put(new Put(rowkey.getBytes())");
+	        	 /*System.out.println("else if(tableName.equalsIgnoreCase(\"" + oldTbName + "\"))");
+	        	 System.out.println("{ ");
+    			 System.out.println("\thyApp.put" + oldTbName + "2HyperBase(msgArr, msgQueue);");
+				 System.out.println("}");*/
 	        	 
-	        	 while ((line = br.readLine()) != null) 
-	        	 {
-	        		 String[] cols = line.substring(line.indexOf("      ")+6).split(" ");
-	        		 
-//				System.out.println("public static final byte[] " + colName + " = \"" + colName +"\".getBytes();");
-	        		 
-//	        		 sb.append(".add(" + family + ", " + entityName + "." + colName + ", Bytes.toBytes(" + v + trans(colName) + "()))" + "\n");
-	        	 }
+	        	 /*System.out.println("else if(tbName.equalsIgnoreCase(\"" + oldTbName + "\"))");
+	        	 System.out.println("{ ");
+    			 System.out.println("\tbuilder = EMS_FILE_MSG_Protos." + tableName + ".newBuilder();");
+    			 System.out.println("\tdesc = EMS_FILE_MSG_Protos." + tableName + ".Builder.getDescriptor();");
+				 System.out.println("}");*/
 	        	 
-//	        	 System.out.println(sb.toString());
+				 System.out.println("else if(tbName.equalsIgnoreCase(\"" + oldTbName + "\"))");
+				 System.out.println("{ ");
+				 System.out.println("\tesb_builder.set" + tableName.substring(0, 1).toUpperCase() + tableName.substring(1, tableName.length()).toLowerCase() + "(((EMS_FILE_MSG_Protos." + tableName + ".Builder) builder).build());");
+				 System.out.println("}");
+	        	 
+	        	 
+        		 i++;
 	         }
 		} 
 		catch (Exception e) 
@@ -68,23 +73,78 @@ public class GenProtobufByDataBase
 		InputStreamReader isr = new InputStreamReader(new FileInputStream(f), "GBK");
 	   	 BufferedReader br = new BufferedReader(isr);
 	   	 String line = "";
+	   	 
+	   	 String oldTableName = f.getName().toLowerCase().replaceAll(".txt", "").toUpperCase();
 		 String tableName = transTableName(f.getName().toLowerCase().replaceAll(".txt", ""));
 	   	
 		 String family = "f";
     	 String entityName = "EMS_Field_List." + tableName;
-    	 String v = "msg.get" + tableName + "().get";
+    	 String v = "msg.get" + tableName.substring(0, 1).toUpperCase() + tableName.substring(1, tableName.length()).toLowerCase() + "().get";
     	 
-	   	 StringBuffer sb = new StringBuffer(f.getName().toUpperCase().replaceAll(".TXT", "") + ".put(new Put(rowkey.getBytes())");
-	   	 
+	   	 StringBuffer sb = new StringBuffer("\t\t\t" + oldTableName + ".put(new Put(rowkey.getBytes())\n");
+	   	 System.out.println("public void put" + oldTableName + "2HyperBase(List<EMS_FILE_MSG_Protos.EMS_FILE_MSG> msgArr, BlockingQueue<EMS_FILE_MSG_Protos.EMS_FILE_MSG> msgQueue)");
+	   	 System.out.println("{");
+	   	 System.out.println("\tfor (EMS_FILE_MSG_Protos.EMS_FILE_MSG msg : msgArr)");
+	   	 System.out.println("\t{");
+	   	 System.out.println("\t\ttry");
+	   	 System.out.println("\t\t{");
+	   	 System.out.println("\t\t\tString rowkey=new StringBuffer(msg.getTbresorgm().getORGCode()).toString();");
+	   	 System.out.println("\t\t\tDate d = new Date();");
+	   	 System.out.println("\t\t\tDateFormat df = new SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss\");");
+	   	 System.out.println("\t\t\tString ds = df.format(d);");
 	   	 while ((line = br.readLine()) != null) 
 	   	 {
 	   		String colName = line.substring(line.indexOf("      ")+6).split(" ")[0].toUpperCase();
-	   		sb.append(".add(" + family + ", " + entityName + "." + colName + ", Bytes.toBytes(" + v + tranCol(colName) + "()))" + "\n");
+	   		sb.append("\t\t\t\t.add(" + family + ", " + entityName + "." + colName + ", Bytes.toBytes(" + v + tranCol(colName).toUpperCase() + "()))" + "\n");
 	   	 }
 	   	 
 	   	 
-	   	 sb.append(" ); \n ");
+	   	 sb.append("\t\t\t); \n ");
 	   	 System.out.println(sb.toString());
+	   	 
+	   	//try's }
+	   	System.out.println("\t\t}");
+	   	System.out.println("\t\tcatch(Exception e)");
+	   	System.out.println("\t\t{");
+	   	System.out.println("\t\t\tlog.error(\"" + oldTableName.replaceAll("_", "") + " put error, msg is 【\" + msg.toString() + \"】\", e.getMessage());");
+	   	System.out.println("\t\t\te.printStackTrace();");
+	   	System.out.println("\t\t\ttry");
+	   	System.out.println("\t\t\t{");
+	   	System.out.println("\t\t\t\tmsgQueue.put(msg);");
+	   	System.out.println("\t\t\t}");
+	   	System.out.println("\t\t\tcatch (InterruptedException e1)");
+	   	System.out.println("\t\t\t{");
+	   	System.out.println("\t\t\t\tlog.error(\"" + oldTableName.replaceAll("_", "") + " put rollback error, msg is 【\" + msg.toString() + \"】\", e1.getMessage());");
+	   	System.out.println("\t\t\t\te1.printStackTrace();");
+	   	System.out.println("\t\t\t}");
+	   	
+	   	//catch's }
+	   	System.out.println("\t\t}");
+	   	//for's }
+	   	System.out.println("\t}");
+	   	System.out.println("\ttry");
+	   	System.out.println("\t{");
+	   	System.out.println("\t\t" + oldTableName + ".flushCommits();");
+	   	System.out.println("\t\tlog.info(\"" + oldTableName + " table flush\");");
+	   	System.out.println("\t}");
+	   	System.out.println("\tcatch (Exception e) ");
+	   	System.out.println("\t{");
+	   	System.out.println("\t\tlog.error(\"" + oldTableName + " flush error\", e);");
+	   	System.out.println("\t\te.printStackTrace();");
+	   	System.out.println("\t\tfor (EMS_FILE_MSG_Protos.EMS_FILE_MSG msg : msgArr)");
+	   	System.out.println("\t\t{");
+	   	System.out.println("\t\t\ttry ");
+	   	System.out.println("\t\t\t{");
+	   	System.out.println("\t\t\t\tmsgQueue.put(msg);");
+	   	System.out.println("\t\t\t}");
+	   	System.out.println("\t\t\tcatch (InterruptedException e1) ");
+	   	System.out.println("\t\t\t{");
+	   	System.out.println("\t\t\t\tlog.error(\"" + oldTableName + " flush rollback error, msg is 【\" + msg.toString() + \"】\", e1.getMessage());");
+	   	System.out.println("\t\t\t\te1.printStackTrace();");
+	   	System.out.println("\t\t\t}");
+	   	System.out.println("\t\t}");
+	   	System.out.println("\t}");
+	   	System.out.println("}\n\n");
 	}
 
 
@@ -104,10 +164,10 @@ public class GenProtobufByDataBase
 	   		sb.append("	public static final byte[] " + colName + " = \"" + colName +"\".getBytes(); \n");
 	   	 }
 	   	 
-	   	sb.append("public static final byte[] Rec_Avail_Flag = \"REC_AVAIL_FLAG\".getBytes(); \n");
-	   	sb.append("public static final byte[] Load_Date = \"LOAD_DATE\".getBytes(); \n");
-	   	sb.append("public static final byte[] Load_Time = \"LOAD_TIME\".getBytes(); \n");
-	   	sb.append("public static final byte[] Load_TimeStamp = \"LOAD_TIMESTAMP\".getBytes(); \n");
+	   	sb.append("\tpublic static final byte[] Rec_Avail_Flag = \"REC_AVAIL_FLAG\".getBytes(); \n");
+	   	sb.append("\tpublic static final byte[] Load_Date = \"LOAD_DATE\".getBytes(); \n");
+	   	sb.append("\tpublic static final byte[] Load_Time = \"LOAD_TIME\".getBytes(); \n");
+	   	sb.append("\tpublic static final byte[] Load_TimeStamp = \"LOAD_TIMESTAMP\".getBytes(); \n");
 	   	 
 	   	 sb.append("} \n");
 	   	 sb.append("public static class " + tableName + "_List{} \n\n");
@@ -129,10 +189,15 @@ public class GenProtobufByDataBase
 	   	 while ((line = br.readLine()) != null) 
 	   	 {
 	   		 String[] cols = line.substring(line.indexOf("      ")+6).split(" ");
-	   		 sb.append("optional string " + cols[0] + " = " + (++i) + "; \n");
+	   		 if ("DISTCD".equals(cols[0].toUpperCase()) 
+	   				|| "DATADT".equals(cols[0].toUpperCase()) 
+	   				|| "LOADDT".equals(cols[0].toUpperCase())
+	   				|| "DFILE_NAME".equals(cols[0].toUpperCase()))
+	   			 continue;
+	   		 sb.append("\toptional string " + cols[0].toUpperCase() + " = " + (++i) + "; \n");
 	   	 }
 	   	 
-	   	 sb.append(" } \n");
+	   	 sb.append("} \n");
 	   	 
 	   	 sb.append("message " + tableName + "_LIST { \n");
 	   	 sb.append("	repeated " + tableName + " " + tableName.toLowerCase() + "list = 1; \n");
@@ -192,8 +257,8 @@ public class GenProtobufByDataBase
 			}
 			else
 			{
-				String[] dest = new String[tempStrs.length - 2];
-				System.arraycopy(tempStrs, 2, dest, 0, tempStrs.length - 2);
+				String[] dest = new String[tempStrs.length];
+				System.arraycopy(tempStrs, 0, dest, 0, tempStrs.length);
 				res = trans(dest);
 			}
 		}

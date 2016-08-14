@@ -32,10 +32,11 @@ public class GenCreateHiveTable {
 //			            StringBuffer sb = new StringBuffer(" drop table if exists ems_pmart.TMP_" + tableName + "; \n");
 //			            sb.append("create EXTERNAL table ems_pmart.TMP_" + tableName + "(");
 
-            StringBuffer sb = new StringBuffer(" drop table if exists ems_pdata_text." + tableName + "; \n");
-            sb.append("create EXTERNAL table ems_pdata_text." + tableName + "(");
+            StringBuffer sb = new StringBuffer(" drop table if exists ems_pdata_range." + tableName + "; \n");
+            sb.append("create table ems_pdata_range." + tableName + "(");
             StringBuffer queryCols = new StringBuffer();
-            
+            String clustCol = "";
+            boolean clustFlag = false;
             while ((line = br.readLine()) != null) 
             {
         		String[] cols = line.substring(line.indexOf("      ")+6).split(" ");
@@ -44,6 +45,25 @@ public class GenCreateHiveTable {
         		
         		queryCols.append(cols[0] + " AS " + cols[0] + ",");
         		
+        		
+        		if (!clustFlag)
+        		{
+        			if (cols[0].toLowerCase().contains("custcd"))
+        			{
+        				clustCol = cols[0];
+        				clustFlag = true;
+        			}
+        			else if (cols[0].toLowerCase().contains("cporgcd"))
+        			{
+        				clustCol = cols[0];
+        				clustFlag = true;
+        			}
+        			else if (cols[0].toLowerCase().contains("postnbr"))
+        			{
+        				clustCol = cols[0];
+        				clustFlag = true;
+        			}
+        		}
             }
             
             queryCols = new StringBuffer(queryCols.toString().substring(0, queryCols.length() - 1));
@@ -60,7 +80,7 @@ public class GenCreateHiveTable {
             sb.append("STORED AS ORC \n" );
             sb.append("TBLPROPERTIES (\"transactional\"=\"true\"); \n\n" );*/
             
-            /*sb.append("PARTITIONED BY RANGE (Acct_Date string) ( \n" );
+            sb.append("PARTITIONED BY RANGE (DataDt string) ( \n" );
             Calendar c = Calendar.getInstance();
     		c.set(Calendar.YEAR, 2015);
     		c.set(Calendar.MONTH, 00);
@@ -80,9 +100,11 @@ public class GenCreateHiveTable {
     		sb.append(" PARTITION VALUES LESS THAN (MAXVALUE) \n");
     		sb.append(") \n");
 //            String[] clusterInfo = clusterMap.get(tableName).split("-");
-    		sb.append("CLUSTERED BY (Mail_num) INTO " + 997 + " BUCKETS \n" );
+    		
+			sb.append("CLUSTERED BY (" + clustCol + ") INTO " + 7 + " BUCKETS \n" );
+    		
             sb.append("STORED AS ORC \n" );
-            sb.append("TBLPROPERTIES (\"transactional\"=\"true\"); \n\n" );*/
+            sb.append("TBLPROPERTIES (\"transactional\"=\"true\"); \n\n" );
             
             /*sb.append("ROW FORMAT SERDE \n");
             sb.append(" 'org.apache.hadoop.hive.ql.io.orc.OrcSerde'  \n");
@@ -104,16 +126,16 @@ public class GenCreateHiveTable {
             sb.append("LOCATION \n");
             sb.append("'/EMS_Data/teamsun/temp/" + tableName.toUpperCase() + "'; \n");*/
             
-            sb.append("ROW FORMAT DELIMITED  " + "\n");
+            /*sb.append("ROW FORMAT DELIMITED  " + "\n");
             sb.append("FIELDS TERMINATED BY \'\\t\'" + "\n");
             sb.append("STORED AS TEXTFILE " + "\n");
             sb.append("LOCATION \n");
-            sb.append("'/EMS_Data/teamsun/temp/" + tableName.toUpperCase() + "'; \n");
+            sb.append("'/EMS_Data/teamsun/temp/" + tableName.toUpperCase() + "'; \n");*/
             
 			            System.out.println(sb.toString());
 //			            System.out.println("insert into table ems_pmart." + tableName.toUpperCase() + " select * from ems_pmart.txt_" + tableName.toUpperCase() + ";");
 //			            System.out.println(" drop table if exists ems_pmart.TXT_" + tableName.toUpperCase() + "; ");
-//            System.out.println("select count(*) from ems_pmart." + tableName.toUpperCase() + ";");
+//            System.out.println("select count(*) from ems_pdata_range." + tableName.toUpperCase() + ";");
 //            System.out.println("select * from ems_pmart." + tableName.toUpperCase() + " limit 5;");
             
 //            System.out.println(" select * from ems_pmart." + tableName.toUpperCase() + " limit 5;");
@@ -121,8 +143,8 @@ public class GenCreateHiveTable {
             
 //            System.out.println("insert into table ems_pmart." + tableName.toUpperCase() + " select " + queryCols.toString() + " from ems_pdata." + tableName.toUpperCase() + ";");
 //            System.out.println("truncate table ems_pmart." + tableName.toUpperCase());
-            
-        }
+//            System.out.println("alter '" + tableName.toUpperCase() + "', {NAME => 'f', DATA_BLOCK_ENCODING => 'PREFIX', COMPRESSION => 'SNAPPY'}");
+        } 
 	}
 
 	private static String changeType(String type) 
