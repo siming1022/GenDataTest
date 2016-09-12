@@ -59,7 +59,7 @@ public class GenProtobuf
     			 if (!"1".equals(colName))
     			 {
     				 //生成protobuf
-    				 protSb.append("\t" + ("P".equals(s)?"required":"optional") + " string " + colName + " = " + (++i) + ";\n");
+    				 protSb.append("\t" + ("P".equals(s)?"required":"optional") + " string " + colName.toUpperCase() + " = " + (++i) + ";\n");
     			 }
     		 }
            

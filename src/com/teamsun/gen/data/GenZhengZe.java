@@ -25,16 +25,25 @@ public class GenZhengZe
 				InputStreamReader isr = new InputStreamReader(new FileInputStream(f), "GBK");
 				BufferedReader br = new BufferedReader(isr);
 				String line = "";
-				String patternStr = "";
+				String patternStr = f.getName().toLowerCase().replaceAll(".txt", "").toUpperCase()+"=";
 				int i = 0;
+				int sum = 0;
 				while ((line = br.readLine()) != null) 
 	            {
 					String[] cols = line.substring(line.indexOf("      ")+6).split(" ");
-					patternStr += "([\\\\s\\\\S]{" + getLength(cols[1]) + "})";
+					
+					if ("DISTCD".equals(cols[0].toUpperCase()) || "DFILE_NAME".equals(cols[0].toUpperCase())
+							|| "DATADT".equals(cols[0].toUpperCase()) || "LOADDT".equals(cols[0].toUpperCase()))
+						continue;
+					
+					sum += Integer.parseInt(getLength(cols[1]));
+					
+					patternStr += "([\\s\\S]{" + getLength(cols[1]) + "})";
 //					i += Integer.parseInt(getLength(cols[1]));
 //					System.out.println(cols[1] + ": " + i);
 	            }
 				
+//				System.out.println(f.getName().toLowerCase().replaceAll(".txt", "").toUpperCase() + ": " + sum);
 				System.out.println(patternStr);
 			}
 		}

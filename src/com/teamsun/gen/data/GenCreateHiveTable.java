@@ -35,7 +35,7 @@ public class GenCreateHiveTable {
             StringBuffer sb = new StringBuffer(" drop table if exists ems_pdata_range." + tableName + "; \n");
             sb.append("create table ems_pdata_range." + tableName + "(");
             StringBuffer queryCols = new StringBuffer();
-            String clustCol = "";
+            String clustCol = "Mail_num";
             boolean clustFlag = false;
             while ((line = br.readLine()) != null) 
             {
@@ -46,7 +46,7 @@ public class GenCreateHiveTable {
         		queryCols.append(cols[0] + " AS " + cols[0] + ",");
         		
         		
-        		if (!clustFlag)
+        		/*if (!clustFlag)
         		{
         			if (cols[0].toLowerCase().contains("custcd"))
         			{
@@ -63,8 +63,18 @@ public class GenCreateHiveTable {
         				clustCol = cols[0];
         				clustFlag = true;
         			}
-        		}
+        		}*/
             }
+            
+//            Rec_Avail_Flag CHAR(1) CHARACTER SET LATIN CASESPECIFIC TITLE '记录有效标志' NOT NULL,
+//            Load_Date DATE FORMAT 'YYYYMMDD' TITLE '加载日期',
+//            Load_Time INTEGER TITLE '加载时间',
+//            Load_Timestamp TIMESTAMP(0) TITLE '加载时间戳')
+            
+            /*sb.append("Rec_Avail_Flag string, " + " \n");
+            sb.append("Load_Date string, " + " \n");
+            sb.append("Load_Time int, " + " \n");
+            sb.append("Load_Timestamp string," + " \n");*/
             
             queryCols = new StringBuffer(queryCols.toString().substring(0, queryCols.length() - 1));
             sb = new StringBuffer(sb.substring(0, sb.length() - 3));
@@ -126,22 +136,23 @@ public class GenCreateHiveTable {
             sb.append("LOCATION \n");
             sb.append("'/EMS_Data/teamsun/temp/" + tableName.toUpperCase() + "'; \n");*/
             
-            /*sb.append("ROW FORMAT DELIMITED  " + "\n");
+           /* sb.append("ROW FORMAT DELIMITED  " + "\n");
             sb.append("FIELDS TERMINATED BY \'\\t\'" + "\n");
             sb.append("STORED AS TEXTFILE " + "\n");
             sb.append("LOCATION \n");
             sb.append("'/EMS_Data/teamsun/temp/" + tableName.toUpperCase() + "'; \n");*/
             
-			            System.out.println(sb.toString());
-//			            System.out.println("insert into table ems_pmart." + tableName.toUpperCase() + " select * from ems_pmart.txt_" + tableName.toUpperCase() + ";");
+//			            System.out.println(sb.toString());
 //			            System.out.println(" drop table if exists ems_pmart.TXT_" + tableName.toUpperCase() + "; ");
-//            System.out.println("select count(*) from ems_pdata_range." + tableName.toUpperCase() + ";");
+//            System.out.println("select count(*) from ems_pdata." + tableName.toUpperCase() + ";");
+//            System.out.println("select count(*), load_date from ems_pdata." + tableName.toUpperCase() + " where load_date = '20160906' group by load_date;");
+//            System.out.println("select * from ems_pdata_range." + tableName.toUpperCase() + " limit 5;");
 //            System.out.println("select * from ems_pmart." + tableName.toUpperCase() + " limit 5;");
             
 //            System.out.println(" select * from ems_pmart." + tableName.toUpperCase() + " limit 5;");
 //			            System.out.println("hdfs dfs -rmr '/EMS_Data/teamsun/" + tableName.toUpperCase() + "'; \n");
             
-//            System.out.println("insert into table ems_pmart." + tableName.toUpperCase() + " select " + queryCols.toString() + " from ems_pdata." + tableName.toUpperCase() + ";");
+            System.out.println("insert into table ems_pdata_range." + tableName.toUpperCase() + " select " + queryCols.toString() + " from ems_pdata." + tableName.toUpperCase() + ";");
 //            System.out.println("truncate table ems_pmart." + tableName.toUpperCase());
 //            System.out.println("alter '" + tableName.toUpperCase() + "', {NAME => 'f', DATA_BLOCK_ENCODING => 'PREFIX', COMPRESSION => 'SNAPPY'}");
         } 

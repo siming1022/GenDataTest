@@ -16,6 +16,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Test {
 
@@ -23,13 +25,27 @@ public class Test {
 	
 	public static void main(String[] args) throws Exception 
 	{
-		Date d = new Date();
+		/*Date d = new Date();
 		DateFormat df = new SimpleDateFormat("yyyyMMdd");
 		String ds = df.format(d);
 		
 		String s = "20160216140004.dat";
 		
-		System.out.println(s.substring(0, 8));
+		System.out.println(s.substring(0, 8));*/
+		
+		/*String s = "///data/TMS01_20160801_06_5230980_20160801120301_20160801150300.TXT";
+		Pattern p = Pattern.compile("TMS01_\\d{8}");
+		Matcher m = p.matcher(s);
+		
+		while (m.find())
+			System.out.println(m.group(0).split("_")[1]);
+		
+		System.out.println(m.groupCount());*/
+		
+		DateFormat df = new SimpleDateFormat("HHmm");
+		String ds = df.format(new Date());
+		
+		System.out.println(ds);
 	}
 
 

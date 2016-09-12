@@ -20,7 +20,6 @@ public class ReplaceDateMain {
 			String line = "";
 			while ((line = br.readLine()) != null)
 			{
-				line.re
 			}
 			
 		}
