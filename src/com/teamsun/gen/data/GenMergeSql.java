@@ -15,7 +15,7 @@ public class GenMergeSql {
 
 	public static void main(String[] args) throws Exception
 	{
-		File dir = new File("D://bigData//orcMerge/");
+		File dir = new File("D://bigData//导数据//");
 		
 		File[] fs = dir.listFiles(new FilenameFilter() {
 			
@@ -45,7 +45,7 @@ public class GenMergeSql {
             String bSql = "";
             String abSql = "";
             
-            String[] noCols = clusterMap.get(tableName).split("-")[0].split(",");
+            String[] noCols = clusterMap.get(tableName)==null?null:clusterMap.get(tableName).split("-")[0].split(",");
             while ((line = br.readLine()) != null) 
             {
         		String[] cols = line.substring(line.indexOf("      ")+6).split(" ");

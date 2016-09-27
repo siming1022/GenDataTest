@@ -90,7 +90,7 @@ public class GenCreateHiveTable {
             sb.append("STORED AS ORC \n" );
             sb.append("TBLPROPERTIES (\"transactional\"=\"true\"); \n\n" );*/
             
-            sb.append("PARTITIONED BY RANGE (DataDt string) ( \n" );
+            /*sb.append("PARTITIONED BY RANGE (DataDt string) ( \n" );
             Calendar c = Calendar.getInstance();
     		c.set(Calendar.YEAR, 2015);
     		c.set(Calendar.MONTH, 00);
@@ -108,7 +108,7 @@ public class GenCreateHiveTable {
     		}
             
     		sb.append(" PARTITION VALUES LESS THAN (MAXVALUE) \n");
-    		sb.append(") \n");
+    		sb.append(") \n");*/
 //            String[] clusterInfo = clusterMap.get(tableName).split("-");
     		
 			sb.append("CLUSTERED BY (" + clustCol + ") INTO " + 7 + " BUCKETS \n" );
@@ -142,7 +142,7 @@ public class GenCreateHiveTable {
             sb.append("LOCATION \n");
             sb.append("'/EMS_Data/teamsun/temp/" + tableName.toUpperCase() + "'; \n");*/
             
-//			            System.out.println(sb.toString());
+			            System.out.println(sb.toString());
 //			            System.out.println(" drop table if exists ems_pmart.TXT_" + tableName.toUpperCase() + "; ");
 //            System.out.println("select count(*) from ems_pdata." + tableName.toUpperCase() + ";");
 //            System.out.println("select count(*), load_date from ems_pdata." + tableName.toUpperCase() + " where load_date = '20160906' group by load_date;");
@@ -152,7 +152,7 @@ public class GenCreateHiveTable {
 //            System.out.println(" select * from ems_pmart." + tableName.toUpperCase() + " limit 5;");
 //			            System.out.println("hdfs dfs -rmr '/EMS_Data/teamsun/" + tableName.toUpperCase() + "'; \n");
             
-            System.out.println("insert into table ems_pdata_range." + tableName.toUpperCase() + " select " + queryCols.toString() + " from ems_pdata." + tableName.toUpperCase() + ";");
+//            System.out.println("insert into table ems_pdata_range." + tableName.toUpperCase() + " select " + queryCols.toString() + " from ems_pdata." + tableName.toUpperCase() + ";");
 //            System.out.println("truncate table ems_pmart." + tableName.toUpperCase());
 //            System.out.println("alter '" + tableName.toUpperCase() + "', {NAME => 'f', DATA_BLOCK_ENCODING => 'PREFIX', COMPRESSION => 'SNAPPY'}");
         } 
